@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -15,7 +14,6 @@ import {
   Sunset
 } from "lucide-react";
 import WeatherIcon from "./WeatherIcon";
-import ApiKeyInput from "./ApiKeyInput";
 import { useWeather } from "@/hooks/useWeather";
 
 const WeatherApp = () => {
@@ -24,11 +22,9 @@ const WeatherApp = () => {
   const { weatherData, loading, error, fetchWeather, apiKey, setApiKey } = useWeather();
 
   useEffect(() => {
-    // Load API key from localStorage
-    const savedApiKey = localStorage.getItem("weather-api-key");
-    if (savedApiKey) {
-      setApiKey(savedApiKey);
-    }
+    // Set the API key directly
+    const defaultApiKey = "e1332584af4a7a7f3090980928b49ae4";
+    setApiKey(defaultApiKey);
   }, [setApiKey]);
 
   useEffect(() => {
@@ -60,31 +56,6 @@ const WeatherApp = () => {
       fetchWeather(location);
       setCurrentLocation(location);
       setLocation("");
-    }
-  };
-
-  const handleApiKeySave = () => {
-    toast({
-      title: "API Key Saved",
-      description: "Your API key has been saved. You can now fetch weather data.",
-    });
-    
-    // Auto-fetch weather for current location after saving API key
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          fetchWeather(`${latitude},${longitude}`);
-          setCurrentLocation("Current Location");
-        },
-        () => {
-          fetchWeather("London");
-          setCurrentLocation("London");
-        }
-      );
-    } else {
-      fetchWeather("London");
-      setCurrentLocation("London");
     }
   };
 
@@ -121,41 +92,30 @@ const WeatherApp = () => {
           </p>
         </div>
 
-        {/* API Key Input */}
-        {!apiKey && (
-          <ApiKeyInput 
-            apiKey={apiKey}
-            setApiKey={setApiKey}
-            onSave={handleApiKeySave}
-          />
-        )}
-
         {/* Search Bar */}
-        {apiKey && (
-          <Card className="mb-8 backdrop-blur-md bg-white/10 border-white/20">
-            <CardContent className="p-6">
-              <form onSubmit={handleSearch} className="flex gap-4">
-                <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 h-4 w-4" />
-                  <Input
-                    type="text"
-                    placeholder="Enter city name (e.g., London, New York)"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    className="pl-10 bg-white/20 border-white/30 text-white placeholder:text-white/60"
-                  />
-                </div>
-                <Button 
-                  type="submit" 
-                  disabled={loading}
-                  className="bg-white/20 hover:bg-white/30 text-white border-white/30"
-                >
-                  {loading ? "Searching..." : "Search"}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-        )}
+        <Card className="mb-8 backdrop-blur-md bg-white/10 border-white/20">
+          <CardContent className="p-6">
+            <form onSubmit={handleSearch} className="flex gap-4">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 h-4 w-4" />
+                <Input
+                  type="text"
+                  placeholder="Enter city name (e.g., London, New York)"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  className="pl-10 bg-white/20 border-white/30 text-white placeholder:text-white/60"
+                />
+              </div>
+              <Button 
+                type="submit" 
+                disabled={loading}
+                className="bg-white/20 hover:bg-white/30 text-white border-white/30"
+              >
+                {loading ? "Searching..." : "Search"}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
 
         {/* Error Display */}
         {error && (
